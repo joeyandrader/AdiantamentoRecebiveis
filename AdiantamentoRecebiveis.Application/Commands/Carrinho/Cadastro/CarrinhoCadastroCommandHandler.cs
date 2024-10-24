@@ -1,28 +1,29 @@
 ﻿using AdiantamentoRecebiveis.Application.Dto;
 using AdiantamentoRecebiveis.Domain.Entities;
 using AdiantamentoRecebiveis.Domain.Repositories;
-using AdiantamentoRecebiveis.Domain.Services;
+using MediatR;
+using Microsoft.Data.SqlClient;
+using System.Data;
 
-namespace AdiantamentoRecebiveis.Application.Services;
-public class CartService(
-    ICartRepository _repository,
+namespace AdiantamentoRecebiveis.Application.Commands.Carrinho.Cadastro;
+public class CarrinhoCadastroCommandHandler(ICartRepository _repository,
     ICartNfRepository _cartNfRepository,
     INotaFiscalRepository _notaFiscalRepository,
-    IAntecipacaoRepository _antecipacaoRepository
-    ) : ICartService
+    IAntecipacaoRepository _antecipacaoRepository) : IRequestHandler<CarrinhoCadastroCommand, AntecipacaoDto>
 {
-    public async Task<AntecipacaoDto> CreateAsync(int empresaId, List<int> NfsId)
+    public async Task<AntecipacaoDto> Handle(CarrinhoCadastroCommand request, CancellationToken cancellationToken)
     {
+
         Cart cart = new Cart();
-        cart.CorporateId = empresaId;
+        cart.CorporateId = request.empresaId;
 
         var createCart = await _repository.CreateAsync(cart);
         if (createCart != null)
         {
-            foreach (var id in NfsId)
+            foreach (var id in request.NfsId)
             {
                 //buscar as nfs
-                var getNf = await _notaFiscalRepository.GetAsync(id);
+                var getNf = await _notaFiscalRepository.GetNfByCorporate(id, request.empresaId);
                 if (getNf != null)
                 {
                     await _cartNfRepository.CreateAsync(new CartNf
@@ -38,11 +39,6 @@ public class CartService(
         else
             throw new Exception("Houve um problema ao criar o carrinho!");
 
-        return await _antecipacaoRepository.CalculaAntecipado(empresaId, createCart.Id!.Value);
-    }
-
-    public async Task<AntecipacaoDto> GetAsync(int empresaId, int cartId)
-    {
-        return await _antecipacaoRepository.CalculaAntecipado(empresaId, cartId);
+        return await _antecipacaoRepository.CalculaAntecipado(request.empresaId, createCart.Id!.Value);
     }
 }

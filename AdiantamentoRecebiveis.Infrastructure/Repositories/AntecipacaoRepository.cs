@@ -16,13 +16,14 @@ public class AntecipacaoRepository(DataContext _context) : IAntecipacaoRepositor
                      where b.Id == empresaId && a.Id == cartId
                      select new
                      {
+                         a.Id,
                          b.Nome,
                          b.Cnpj,
                          b.Limite,
                          d
                      });
 
-        var result = query.AsEnumerable().GroupBy(x => new { x.Nome, x.Cnpj, x.Limite })
+        var result = query.AsEnumerable().GroupBy(x => new { x.Id, x.Nome, x.Cnpj, x.Limite })
             .Select(g =>
             {
                 var notasFiscais = g.Select(n =>
@@ -42,6 +43,7 @@ public class AntecipacaoRepository(DataContext _context) : IAntecipacaoRepositor
 
                 return new AntecipacaoDto()
                 {
+                    Id = g.Key.Id,
                     Empresa = g.Key.Nome,
                     Cnpj = g.Key.Cnpj,
                     Limite = g.Key.Limite,

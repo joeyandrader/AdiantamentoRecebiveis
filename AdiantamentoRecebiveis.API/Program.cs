@@ -1,17 +1,23 @@
 using System.Data;
 using System.Data.SqlClient;
 using System.Reflection;
+using AdiantamentoRecebiveis.API.Extensions;
 using AdiantamentoRecebiveis.API.Ioc;
+using AdiantamentoRecebiveis.Application.IoC;
 using AdiantamentoRecebiveis.Application.Utils;
 using AdiantamentoRecebiveis.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.DependencyInjection;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 //Add Services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(opt =>
+    {
+        opt.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+    });
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -21,7 +27,13 @@ builder.Services.AddSwaggerGen(opt =>
     var xmlFileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFileName);
     opt.IncludeXmlComments(xmlPath);
+    opt.DescribeAllParametersInCamelCase();
 });
+
+builder.Services.AddMediatR(x => x.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
+builder.Services.RegistrarApplicationDependency();
+
 
 //Dependecy Load
 Ioc.LoadDependencyInjection(builder.Services);
@@ -35,9 +47,6 @@ var teste = AppSettings.ConnectionString;
 builder.Services.AddDbContext<DataContext>(
     conn => conn.UseSqlServer("Server=JOEL\\SQLEXPRESS;Database=testedb;Trusted_Connection=True;TrustServerCertificate=True;"));
 
-
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
 builder.Services.AddControllers();
 
 var app = builder.Build();
@@ -47,19 +56,11 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseSwagger(c => { c.RouteTemplate = "Api/swagger/{documentName}/swagger.json"; });
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("api/swagger/v1/swagger.json", "AdiantamentoRecebiveis API v1");
-        c.RoutePrefix = "api/swagger";
-    });
-    app.UseDeveloperExceptionPage();
 }
 
+app.RegisterControllers();
 app.UseHttpsRedirection();
-app.UseRouting();
 app.MapControllers();
 
 
 app.Run();
-

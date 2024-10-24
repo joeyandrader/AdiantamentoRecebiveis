@@ -1,38 +1,29 @@
-﻿using AdiantamentoRecebiveis.API.Middlewares;
-using AdiantamentoRecebiveis.Application.ViewsObjects;
-using AdiantamentoRecebiveis.Domain.Entities;
-using AdiantamentoRecebiveis.Domain.Services;
-using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using System.Net;
+﻿using AdiantamentoRecebiveis.API.Extensions;
+using AdiantamentoRecebiveis.API.Responses;
+using AdiantamentoRecebiveis.Application.Commands.Carrinho.Cadastro;
+using AdiantamentoRecebiveis.Application.Commands.Corporate.Cadastro;
+using AdiantamentoRecebiveis.Application.Commands.NotaFiscal.Cadastro;
+using MediatR;
+using System.Text.RegularExpressions;
 
 namespace AdiantamentoRecebiveis.API.Controllers;
 
-/// <summary>
-/// Controller for handling notafiscais registrations.
-/// </summary>
-[Route("api/[controller]")]
-[ApiController]
-public class NotaFiscalController(INotaFiscalService _service, IMapper _mapper) : BaseController
+public static class NotaFiscalController
 {
-    /// <summary>
-    /// Cria notas ficais
-    /// </summary>
-    /// <param name="createDTO"></param>
-    /// <returns></returns>
-    [HttpPost("create")]
-    public async Task<ActionResult> Create([FromBody] NotasFicaisVO createDTO)
+    private const string Grupo = "NotaFiscal";
+    public static void RegistraNotaFiscalController(this WebApplication app)
     {
-        try
-        {
-            if (createDTO is null)
-                return BuildResponse(success: false, message: "Invalid Request", statusCode: HttpStatusCode.BadRequest);
+        var carrinhoGrupo = app
+         .CriaGrupo(Grupo)
+         .WithTags(Grupo);
 
-            return BuildResponse(await _service.CreateAsync(_mapper.Map<NotasFiscais>(createDTO)), message: "NotaFiscal cadastrada com sucesso!");
-        }
-        catch (DefaultException ex)
-        {
-            return BuildResponse(success: false, message: ex.Message, statusCode: ex._statusCode!.Value);
-        }
+
+        carrinhoGrupo.MapPost("/",
+            async (NotaFiscalCadastroCommand request, IMediator mediator) =>
+            GlobalResponse.Create201Response(await mediator.Send(request)))
+            .Produces(StatusCodes.Status201Created , typeof(Domain.Entities.NotasFiscais))
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status500InternalServerError)
+            .Accepts<CarrinhoCadastroCommand>("application/json");
     }
 }

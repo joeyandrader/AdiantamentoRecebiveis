@@ -1,10 +1,5 @@
-using System;
-using AdiantamentoRecebiveis.Application.Services;
 using AdiantamentoRecebiveis.Domain.Repositories;
-using AdiantamentoRecebiveis.Domain.Services;
-using AdiantamentoRecebiveis.Infrastructure.Persistence;
 using AdiantamentoRecebiveis.Infrastructure.Repositories;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace AdiantamentoRecebiveis.API.Ioc
 {
@@ -19,19 +14,12 @@ namespace AdiantamentoRecebiveis.API.Ioc
         /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
         public static void LoadDependencyInjection(IServiceCollection services)
         {
-            #region Services
-            services.AddScoped<ICorporateService, CorporateService>();
-            services.AddScoped<IAntecipacaoService, AntecipacaoService>();
-            services.AddScoped<INotaFiscalService, NotaFiscalService>();
-            services.AddScoped<ICartService, CartService>();
-            #endregion
-
             #region Repository
-            services.AddScoped<ICorporateRepository, CorporateRepository>();
-            services.AddScoped<IAntecipacaoRepository, AntecipacaoRepository>();
-            services.AddScoped<INotaFiscalRepository, NotaFiscalRepository>();
-            services.AddScoped<ICartRepository, CartRepository>();
-            services.AddScoped<ICartNfRepository, CartNfRepository>();
+            services.AddTransient<ICorporateRepository, CorporateRepository>();
+            services.AddTransient<IAntecipacaoRepository, AntecipacaoRepository>();
+            services.AddTransient<INotaFiscalRepository, NotaFiscalRepository>();
+            services.AddTransient<ICartRepository, CartRepository>();
+            services.AddTransient<ICartNfRepository, CartNfRepository>();
             #endregion
         }
     }
