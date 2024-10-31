@@ -30,4 +30,9 @@ public class NotaFiscalRepository(DataContext _context) : INotaFiscalRepository
             throw new Exception("Nota fiscal não encontrada!");
         return result;
     }
+
+    public async Task<IEnumerable<NotasFiscais>> List()
+    {
+        return await _context.notasFiscais.ToListAsync();
+    }
 }

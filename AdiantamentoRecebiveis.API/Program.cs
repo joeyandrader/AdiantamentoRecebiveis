@@ -34,7 +34,15 @@ builder.Services.AddMediatR(x => x.RegisterServicesFromAssembly(typeof(Program).
 
 builder.Services.RegistrarApplicationDependency();
 
-
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader();
+    });
+});
 //Dependecy Load
 Ioc.LoadDependencyInjection(builder.Services);
 
@@ -45,7 +53,7 @@ var teste = AppSettings.ConnectionString;
 
 //For automatic generate add apply migrations
 builder.Services.AddDbContext<DataContext>(
-    conn => conn.UseSqlServer("Server=JOEL\\SQLEXPRESS;Database=testedb;Trusted_Connection=True;TrustServerCertificate=True;"));
+    conn => conn.UseSqlServer("Server=DESKTOP-I6SMBS7\\SQLEXPRESS;Database=testedb;Trusted_Connection=True;TrustServerCertificate=True;"));
 
 builder.Services.AddControllers();
 
@@ -57,7 +65,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors("AllowAll");
 app.RegisterControllers();
 app.UseHttpsRedirection();
 app.MapControllers();

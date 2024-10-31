@@ -7,4 +7,5 @@ public interface ICorporateRepository
 {
     public Task<Corporate> GetAsync(int id);
     public Task<Corporate> Create(Corporate corporate);
+    public Task<IEnumerable<Corporate>> List();
 }

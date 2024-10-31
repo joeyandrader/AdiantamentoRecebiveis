@@ -5,6 +5,7 @@ using AdiantamentoRecebiveis.Application.Commands.Corporate.Cadastro;
 using AdiantamentoRecebiveis.Application.Commands.NotaFiscal.Cadastro;
 using AdiantamentoRecebiveis.Application.Queries.Carrinho.ObterCarrinho;
 using AdiantamentoRecebiveis.Application.Queries.Empresa.ObterEmpresa;
+using AdiantamentoRecebiveis.Application.Queries.Empresa.ObterListaEmpresa;
 using AdiantamentoRecebiveis.Application.Queries.NotaFiscal.ObterNotaFiscal;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,5 +23,6 @@ public static class ApplicationDependency
         services.AddMediatR(x => x.RegisterServicesFromAssembly(typeof(ObterCarrinhoQueryHandler).Assembly));
         services.AddMediatR(x => x.RegisterServicesFromAssembly(typeof(ObterEmpresaQueryHandler).Assembly));
         services.AddMediatR(x => x.RegisterServicesFromAssembly(typeof(ObterNotaFiscalQueryHandler).Assembly));
+        services.AddMediatR(x => x.RegisterServicesFromAssembly(typeof(ObterListaEmpresaQueryHandler).Assembly));
     }
 }

@@ -21,4 +21,9 @@ public class CorporateRepository(DataContext _context) : ICorporateRepository
             throw new Exception("Empresa não encontrada!");
         return result;
     }
+
+    public async Task<IEnumerable<Corporate>> List()
+    {
+        return await _context.corporates.ToListAsync();
+    }
 }

@@ -11,7 +11,7 @@ public class ContextFactory : IDesignTimeDbContextFactory<DataContext>
     public DataContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<DataContext>();
-        optionsBuilder.UseSqlServer("Server=JOEL\\SQLEXPRESS;Database=testedb;Trusted_Connection=True;TrustServerCertificate=True;");
+        optionsBuilder.UseSqlServer("Server=DESKTOP-I6SMBS7\\SQLEXPRESS;Database=testedb;Trusted_Connection=True;TrustServerCertificate=True;");
 
         return new DataContext(optionsBuilder.Options);
     }
